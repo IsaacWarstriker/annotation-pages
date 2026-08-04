@@ -127,29 +127,22 @@
         <div>
           <h3>View</h3>
           <div class="seg" style="margin-top:6px;">
-            <button id="vRate" class="on" onclick="setView('rate')">Run rate</button>
-            <button id="vCum" onclick="setView('cum')">Cumulative</button>
+            <button id="vCum" class="on" onclick="setView('cum')">Delivered</button>
+            <button id="vRate" onclick="setView('rate')">Monthly output</button>
           </div>
-          <div class="hint" style="margin-top:5px;">Run rate = miles per period. Cumulative = total delivered — where volume asks (500 / 1000) are answered.</div>
+          <div class="hint" style="margin-top:5px;">Delivered = total lane miles banked — where 500 / 1000 land. Monthly output = capacity and committed per period.</div>
         </div>
 
         <div>
           <h3>Roster</h3>
           <div class="ctl" style="margin-top:6px;">
             <div class="row"><label>Wave size</label><output id="oWave">20</output></div>
-            <input type="range" id="waveSize" min="10" max="40" step="5" value="20" oninput="update()">
+            <input type="range" id="waveSize" min="0" max="30" step="10" value="20" oninput="update()">
+            <div class="hint">Locked at 20. 30 shows red. 0 = current team: 3 annotators, no waves.</div>
           </div>
           <div class="btnrow" style="margin-top:8px;">
             <button class="tgl on" id="tW2" onclick="tog('w2')"><i></i>Wave 2</button>
             <button class="tgl" id="tW3" onclick="tog('w3')"><i></i>Wave 3</button>
-          </div>
-          <div class="ctl" id="cW2s" style="margin-top:8px;">
-            <div class="row"><label>Wave 2 start</label><output id="oW2s">M4</output></div>
-            <input type="range" id="w2s" min="4" max="8" step="1" value="4" oninput="update()">
-          </div>
-          <div class="ctl" id="cW3s" style="margin-top:8px; display:none;">
-            <div class="row"><label>Wave 3 start</label><output id="oW3s">M10</output></div>
-            <input type="range" id="w3s" min="10" max="11" step="1" value="10" oninput="update()">
           </div>
         </div>
 
@@ -158,12 +151,12 @@
           <div class="ctl" style="margin-top:6px;">
             <div class="row"><label>Realization</label><output id="oReal">80%</output></div>
             <input type="range" id="real" min="60" max="100" step="5" value="80" oninput="update()">
-            <div class="hint">Locked landing: 80%. Above 80 shows red — commitments there don’t survive real months. Replaced by a measured rate from production data by Month 3.</div>
+            <div class="hint">Locked at 80%. Above 80 shows red — measured rate replaces this from Month 3.</div>
           </div>
           <div class="ctl" style="margin-top:8px;">
             <div class="row"><label>Lead partial output</label><output id="oTlf">70%</output></div>
             <input type="range" id="tlf" min="50" max="90" step="5" value="70" oninput="update()">
-            <div class="hint">Locked landing: 70%. Coordinators deliver ~50% today alongside review, training and escalation duties; above 70 shows red — review load makes it unrealistic. Never 100.</div>
+            <div class="hint">Locked at 70%. Coordinators deliver ~50% today; above 70 shows red.</div>
           </div>
           <div class="btnrow" style="margin-top:8px;">
             <button class="tgl on" id="tExt" onclick="tog('ext')"><i></i>Lead extraction</button>
@@ -179,6 +172,20 @@
             <button id="h12" onclick="setH(12)">M12</button>
           </div>
         </div>
+
+        <details style="border:1px solid var(--line); border-radius:10px; padding:8px 10px; background:#FAFBF8;">
+          <summary style="font-size:10.5px; font-weight:800; text-transform:uppercase; letter-spacing:.12em; color:var(--muted); cursor:pointer;">Advanced · wave starts</summary>
+          <div class="ctl" id="cW2s" style="margin-top:10px;">
+            <div class="row"><label>Wave 2 start</label><output id="oW2s">M4</output></div>
+            <input type="range" id="w2s" min="4" max="8" step="1" value="4" oninput="update()">
+            <div class="hint">Locked default: M4.</div>
+          </div>
+          <div class="ctl" id="cW3s" style="margin-top:10px; display:none;">
+            <div class="row"><label>Wave 3 start</label><output id="oW3s">M10</output></div>
+            <input type="range" id="w3s" min="10" max="11" step="1" value="10" oninput="update()">
+            <div class="hint">Locked default: M10.</div>
+          </div>
+        </details>
 
         <div class="hint" id="teamNote"></div>
       </div>
@@ -473,7 +480,7 @@
 </div>
 
 <script>
-const S = { w2:true, w3:false, ext:true, hope:false, view:'rate', horizon:9 };
+const S = { w2:true, w3:false, ext:true, hope:false, view:'cum', horizon:9, focusM:6, focusTouched:false };
 const TEAM=5, SOFT=5, HOPE=6;
 const C = { ink:'#1B2420', w1:'#2F5D8C', w2:'#D9822B', w3:'#5B8A72', hope:'#9AA098', commit:'#14100B', road:'#6E736B' };
 
@@ -486,6 +493,16 @@ function model(){
   const real=+document.getElementById('real').value/100;
   const tlf=+document.getElementById('tlf').value/100;
   const H = S.w3 ? Math.max(S.horizon,12) : S.horizon;
+  if(waveSize===0){
+    const rows=[]; let cumC=0, cumG=0;
+    for(let m=1;m<=H;m++){
+      const gross=3*30, hope=3*36, com=gross*real;
+      cumC+=com; cumG+=gross;
+      rows.push({m,g1:gross,g2:0,g3:0,gross:gross,hope:hope,com:Math.round(com),
+        cumC:Math.round(cumC),cumG:cumG,c1:cumG,c2:0,c3:0});
+    }
+    return {rows,H,head:3,teams:0,tlW1:0,tlW2:0,w2s,w3s,real,current:true};
+  }
   const head = waveSize*(1+(S.w2?1:0)+(S.w3?1:0));
   const tlW1 = S.ext ? Math.floor(waveSize*(1+(S.w2?1:0))/TEAM) : 0;
   const tlW2 = (S.ext&&S.w3&&S.w2) ? Math.floor(waveSize/TEAM) : 0;
@@ -524,7 +541,10 @@ function crossing(rows, key, thr){
 function fmt(n){ return n.toLocaleString(); }
 
 function update(){
-  document.getElementById('oWave').textContent=document.getElementById('waveSize').value;
+  const wv=+document.getElementById('waveSize').value;
+  document.getElementById('oWave').textContent = wv===0 ? 'Current capacity' : wv;
+  document.getElementById('oWave').style.color = wv>20 ? '#B3261E' : '';
+  document.getElementById('waveSize').style.accentColor = wv>20 ? '#B3261E' : '#1B2420';
   document.getElementById('oW2s').textContent='M'+document.getElementById('w2s').value;
   document.getElementById('oW3s').textContent='M'+document.getElementById('w3s').value;
   document.getElementById('oReal').textContent=document.getElementById('real').value+'%';
@@ -534,9 +554,6 @@ function update(){
   const tv=+document.getElementById('tlf').value;
   document.getElementById('oTlf').style.color = tv>70 ? '#B3261E' : '';
   document.getElementById('tlf').style.accentColor = tv>70 ? '#B3261E' : '#1B2420';
-  const wv=+document.getElementById('waveSize').value;
-  document.getElementById('oWave').style.color = wv>20 ? '#B3261E' : '';
-  document.getElementById('waveSize').style.accentColor = wv>20 ? '#B3261E' : '#1B2420';
   document.getElementById('oTlf').textContent=document.getElementById('tlf').value+'%';
   document.getElementById('cW2s').style.display=S.w2?'':'none';
   document.getElementById('cW3s').style.display=S.w3?'':'none';
@@ -550,22 +567,25 @@ function update(){
 
   // KPIs
   let k='';
-  k+=kpi('Exit M6 · committed run rate', m6?fmt(m6.com):'—', m6?('capacity '+fmt(m6.gross)):'');
-  k+=kpi('Final period · committed', fmt(last.com), 'M'+last.m+' · capacity '+fmt(last.gross));
-  k+=kpi('Delivered by M'+M.H, fmt(last.cumC), 'cumulative committed miles');
-  k+=kpi('500 delivered', c500?('M'+c500.m+' · day '+c500.day):('beyond M'+M.H), 'cumulative committed');
-  k+=kpi('1000 delivered', c1000?('M'+c1000.m+' · day '+c1000.day):('beyond M'+M.H), 'cumulative committed');
+  k+=kpi('Committed lane miles / month — end of M6', m6?fmt(m6.com):'—', m6?('capacity '+fmt(m6.gross)):'');
+  k+=kpi('Committed lane miles / month — end of M'+M.H, fmt(last.com), 'capacity '+fmt(last.gross));
+  k+=kpi('Annotated lane miles delivered by M'+M.H+':', fmt(last.cumC), '');
+  k+=kpi('500 annotated miles delivered on:', c500?('M'+c500.m):('beyond M'+M.H), '');
+  k+=kpi('1000 annotated miles delivered on:', c1000?('M'+c1000.m):('beyond M'+M.H), '');
   document.getElementById('kpis').innerHTML=k;
 
-  document.getElementById('teamNote').textContent =
-    'Headcount '+M.head+' · '+M.teams+' teams of 1+4 · '+
-    (S.ext ? (M.tlW1+' leads leave Wave 1 production at M7'+(M.tlW2?('; '+M.tlW2+' leave Wave 2 at M'+M.w3s):'')) : 'lead extraction off') + '.';
+  document.getElementById('teamNote').textContent = M.current
+    ? 'Current capacity: 3 experienced annotators · 30 miles/period each · no waves, no lead extraction.'
+    : 'Headcount '+M.head+' · '+M.teams+' teams of 1+4 · '+
+      (S.ext ? (M.tlW1+' leads leave Wave 1 production at M7'+(M.tlW2?('; '+M.tlW2+' leave Wave 2 at M'+M.w3s):'')) : 'lead extraction off') + '.';
 
   drawChart(M);
   drawLegend();
 }
 
-function kpi(l,v,s){ return '<div class="kpi"><div class="l">'+l+'</div><div class="v">'+v+'</div><div class="s">'+s+'</div></div>'; }
+function setFocus(m){ S.focusM=m; S.focusTouched=true; update(); }
+
+function kpi(l,v,s){ return '<div class="kpi"><div class="l">'+l+'</div><div class="v">'+v+'</div>'+(s?('<div class="s">'+s+'</div>'):'')+'</div>'; }
 
 function drawLegend(){
   let h='';
@@ -618,11 +638,11 @@ function drawChart(M){
     }
     s+=spath(M.rows.map((r,i)=>[cx(i),y(r.com)]), C.road, 6.5, null);
     s+=spath(M.rows.map((r,i)=>[cx(i),y(r.com)]), '#FFFFFF', 2.1, '8 8');
-    const m6i=M.rows.findIndex(r=>r.m===6);
-    if(m6i>=0){
-      const r=M.rows[m6i];
-      s+='<circle cx="'+cx(m6i)+'" cy="'+y(r.com)+'" r="6" fill="'+C.road+'"/>';
-      s+=badge(cx(m6i), y(r.com)-34, fmt(r.com)+' committed · M6', C.commit, 0.55);
+    const fi=M.rows.findIndex(r=>r.m===Math.min(S.focusM,M.rows[M.rows.length-1].m));
+    if(fi>=0){
+      const r=M.rows[fi];
+      s+='<circle cx="'+cx(fi)+'" cy="'+y(r.com)+'" r="8" fill="'+C.road+'" stroke="#FFFFFF" stroke-width="2"/>';
+      s+=badge(cx(fi), y(r.com)-40, 'M'+r.m+' - '+fmt(r.com)+' MILES', C.commit, 0.55);
     }
   } else {
     // cumulative view — stacked cumulative capacity columns, unified with run-rate view
@@ -637,22 +657,40 @@ function drawChart(M){
     s+=spath(M.rows.map((r,i)=>[cx(i),y(r.cumG)]), '#8B8F87', 1.6, '2 4');
     s+=spath(M.rows.map((r,i)=>[cx(i),y(r.cumC)]), C.road, 6.5, null);
     s+=spath(M.rows.map((r,i)=>[cx(i),y(r.cumC)]), '#FFFFFF', 2.1, '8 8');
+    const bottomTags={};
     [500,1000].forEach(thr=>{
       if(thr<maxV){
         s+='<line x1="'+left+'" y1="'+y(thr)+'" x2="'+right+'" y2="'+y(thr)+'" stroke="'+C.w2+'" stroke-width="1.5" stroke-dasharray="5 5"/>';
         const cr=crossing(M.rows,'cumC',thr);
         if(cr){
           const i=M.rows.findIndex(r=>r.m===cr.m);
-          const xi=cx(i);
-          s+='<circle cx="'+xi+'" cy="'+y(thr)+'" r="5" fill="'+C.w2+'"/>';
-          s+=badge(xi, y(thr)-30, fmt(thr)+' → M'+cr.m+' · day '+cr.day, C.w2);
+          s+='<circle cx="'+cx(i)+'" cy="'+y(thr)+'" r="5" fill="'+C.w2+'"/>';
+          (bottomTags[cr.m]=bottomTags[cr.m]||[]).push(fmt(thr));
         } else {
           s+='<text x="'+(right-4)+'" y="'+(y(thr)-6)+'" fill="'+C.w2+'" font-size="11" font-weight="800" text-anchor="end">'+fmt(thr)+' — beyond horizon</text>';
         }
       }
     });
+    Object.keys(bottomTags).forEach(m=>{
+      const i=M.rows.findIndex(r=>r.m===+m);
+      s+='<text x="'+cx(i)+'" y="'+(bottom+34)+'" fill="'+C.w2+'" font-size="11" font-weight="800" text-anchor="middle">'+bottomTags[m].join(' & ')+'mi</text>';
+      s+='<text x="'+cx(i)+'" y="'+(bottom+46)+'" fill="'+C.w2+'" font-size="10" font-weight="800" text-anchor="middle">Delivered</text>';
+    });
     M.rows.forEach((r,i)=>{ if(r.m===M.H) s+='<text x="'+cx(i)+'" y="'+(y(r.cumC)-10)+'" fill="'+C.commit+'" font-size="12" font-weight="800" text-anchor="middle">'+fmt(r.cumC)+'</text>'; });
+    const c500f=crossing(M.rows,'cumC',500);
+    const defFocus=(c500f&&!S.focusTouched)?c500f.m:Math.min(S.focusM,M.rows[M.rows.length-1].m);
+    const fci=M.rows.findIndex(r=>r.m===defFocus);
+    if(fci>=0){
+      const r=M.rows[fci];
+      s+='<circle cx="'+cx(fci)+'" cy="'+y(r.cumC)+'" r="8" fill="'+C.road+'" stroke="#FFFFFF" stroke-width="2"/>';
+      s+=badge(cx(fci), y(r.cumC)-40, 'M'+r.m+' - '+fmt(r.cumC)+' MILES DELIVERED', C.commit, 0.55);
+    }
   }
+
+  // clickable month columns (both views): tap a month to move the focus marker
+  M.rows.forEach((r,i)=>{
+    s+='<rect x="'+(left+slot*i)+'" y="'+top+'" width="'+slot+'" height="'+(bottom-top)+'" fill="#000" fill-opacity="0" pointer-events="all" style="cursor:pointer" onclick="setFocus('+r.m+')"><title>M'+r.m+'</title></rect>';
+  });
 
   // x labels
   M.rows.forEach((r,i)=>{ s+='<text x="'+cx(i)+'" y="'+(bottom+20)+'" fill="#4A524A" font-size="12" font-weight="700" text-anchor="middle">M'+r.m+'</text>'; });
@@ -728,15 +766,15 @@ function exportJPG(){
   const at=m=>M.rows.find(r=>r.m===m);
   const m6=at(6), last=M.rows[M.rows.length-1];
   const c5=crossing(M.rows,'cumC',500), c10=crossing(M.rows,'cumC',1000);
-  const scen='Scenario: '+waves+' wave'+(waves>1?'s':'')+' \u00b7 size '+ws
+  const scen='Scenario: '+(ws==='0'?'current capacity (3 annotators, no waves)':(waves+' wave'+(waves>1?'s':'')+' \u00b7 size '+ws))
     +(S.w2?' \u00b7 W2 start M'+document.getElementById('w2s').value:'')
     +(S.w3?' \u00b7 W3 start M'+document.getElementById('w3s').value:'')
     +' \u00b7 realization '+real+'%'
     +' \u00b7 lead output '+tlf+'%'
     +' \u00b7 lead extraction '+(S.ext?'on':'off')
-    +' \u00b7 view: '+(view==='rate'?'run rate':'cumulative')
+    +' \u00b7 view: '+(view==='rate'?'monthly output':'delivered')
     +' \u00b7 horizon M'+H;
-  const kpis='Exit M6 committed: '+(m6?fmt(m6.com):'\u2014')
+  const kpis='Exit M6 committed: '+(m6?fmt(m6.com):'—')
     +' \u00b7 M'+H+' committed: '+fmt(last.com)
     +' \u00b7 delivered by M'+H+': '+fmt(last.cumC)
     +' \u00b7 500 delivered: '+(c5?('M'+c5.m+' d'+c5.day):'beyond M'+H)
@@ -774,7 +812,7 @@ function exportJPG(){
     cv.toBlob(function(b){
       const a=document.createElement('a');
       a.href=URL.createObjectURL(b);
-      a.download='capacity_'+(view==='rate'?'runrate':'cumulative')+'_'+waves+'w_r'+real+'_M'+H+'.jpg';
+      a.download='capacity_'+(view==='rate'?'output':'delivered')+'_'+waves+'w_r'+real+'_M'+H+'.jpg';
       a.click();
       setTimeout(function(){URL.revokeObjectURL(a.href);}, 2000);
     },'image/jpeg',0.92);
