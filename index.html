@@ -112,8 +112,9 @@
       <h1 id="pagetitle">Capacity model</h1>
     </div>
     <div class="pagenav">
-      <button id="nav1" class="on" onclick="showPage(1)">1 · Model</button>
+      <button id="nav1" onclick="showPage(1)">1 · Model</button>
       <button id="nav2" onclick="showPage(2)">2 · Notes</button>
+      <button id="nav3" onclick="showPage(3)">3 · Scope</button>
     </div>
   </div>
 
@@ -159,22 +160,23 @@
             <div class="hint">Locked at 70%. Coordinators deliver ~50% today; above 70 shows red.</div>
           </div>
           <div class="btnrow" style="margin-top:8px;">
-            <button class="tgl on" id="tExt" onclick="tog('ext')"><i></i>Lead extraction</button>
             <button class="tgl" id="tHope" onclick="tog('hope')"><i></i>Upper band</button>
           </div>
         </div>
 
-        <div>
-          <h3>Horizon</h3>
-          <div class="seg" style="margin-top:6px;">
-            <button id="h6" onclick="setH(6)">M6</button>
-            <button id="h9" class="on" onclick="setH(9)">M9</button>
-            <button id="h12" onclick="setH(12)">M12</button>
-          </div>
-        </div>
-
         <details style="border:1px solid var(--line); border-radius:10px; padding:8px 10px; background:#FAFBF8;">
-          <summary style="font-size:10.5px; font-weight:800; text-transform:uppercase; letter-spacing:.12em; color:var(--muted); cursor:pointer;">Advanced · wave starts</summary>
+          <summary style="font-size:10.5px; font-weight:800; text-transform:uppercase; letter-spacing:.12em; color:var(--muted); cursor:pointer;">Advanced</summary>
+          <div class="btnrow" style="margin-top:10px;">
+            <button class="tgl on" id="tExt" onclick="tog('ext')"><i></i>Lead extraction</button>
+          </div>
+          <div style="margin-top:10px;">
+            <div style="font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);margin-bottom:4px;">Horizon (top chart)</div>
+            <div class="seg">
+              <button id="h6" onclick="setH(6)">M6</button>
+              <button id="h9" class="on" onclick="setH(9)">M9</button>
+              <button id="h12" onclick="setH(12)">M12</button>
+            </div>
+          </div>
           <div class="ctl" id="cW2s" style="margin-top:10px;">
             <div class="row"><label>Wave 2 start</label><output id="oW2s">M4</output></div>
             <input type="range" id="w2s" min="4" max="8" step="1" value="4" oninput="update()">
@@ -191,8 +193,8 @@
       </div>
 
       <div class="chartbox">
-        <div style="display:flex; justify-content:flex-end; margin-bottom:4px;">
-          <button class="tgl" id="btnExport" onclick="exportJPG()">⤓ Export JPG</button>
+        <div style="margin-bottom:6px;">
+          <div style="font-size:15px; font-weight:900;">Capacity — committed vs. modeled <span style="font-size:10px; font-weight:800; color:#6C736B; text-transform:uppercase; letter-spacing:.1em;">per 20-day period · bars = wave capacity · road = committed</span></div>
         </div>
         <div id="chart"></div>
         <div class="legend" id="legend"></div>
@@ -202,6 +204,46 @@
           absences and team-formation friction live inside the realization gap · individuals are evaluated
           against raw ramp targets, not the division discount.
         </div>
+        <div style="display:flex; justify-content:flex-end; margin-top:8px;">
+          <button class="tgl" id="btnExport" onclick="exportJPG()">⤓ Export JPG</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="chartbox" style="margin-top:14px;">
+      <div style="margin-bottom:6px;">
+        <div style="font-size:15px; font-weight:900;">Scenarios — delivery trajectory <span style="font-size:10px; font-weight:800; color:#6C736B; text-transform:uppercase; letter-spacing:.1em;">by quarter · sales pitch, not committed numbers</span></div>
+        <div class="hint" id="scenReads"></div>
+      </div>
+      <div style="display:flex; flex-wrap:wrap; gap:14px; margin-bottom:8px; align-items:flex-end;">
+        <div>
+          <div style="font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.12em;color:#6C736B;margin-bottom:4px;">Target — two scenarios, not interchangeable</div>
+          <div class="seg">
+            <button id="tgA" class="on" onclick="setScenTarget('A')">A · 10,000 annotated mi</button>
+            <button id="tgB" onclick="setScenTarget('B')">B · 500 route mi (Texas)</button>
+          </div>
+        </div>
+        <div style="min-width:170px;">
+          <div style="font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.12em;color:#6C736B;margin-bottom:2px;">Wave size — same slider as above</div>
+          <div class="ctl"><div class="row"><label style="font-size:10px;">Wave size</label><output id="oWave2" style="font-size:12px;">20</output></div>
+          <input type="range" id="waveSize2" min="0" max="30" step="10" value="20" oninput="wave2Input(this.value)"></div>
+        </div>
+        <div style="min-width:220px;">
+          <div style="font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.12em;color:#6C736B;margin-bottom:2px;">Complexity mix <span id="mixChip" style="color:#1B2420;"></span></div>
+          <div class="row" style="font-size:11px; font-weight:800; margin-bottom:2px;"><span style="text-transform:uppercase; letter-spacing:.06em; font-size:10px;">Complex miles ×0.5</span><output style="font-size:12px; padding-left:10px;">20% · locked</output></div>
+          <div class="ctl"><div class="row"><label style="font-size:10px;">Regular hard ×1.0</label><output id="oMixH" style="font-size:12px;">40%</output></div>
+          <input type="range" id="mixH" min="0" max="80" step="5" value="40" oninput="mixHInput()"></div>
+          <div class="ctl"><div class="row"><label style="font-size:10px;">Regular easy ×1.3</label><output id="oMixE" style="font-size:12px;">40%</output></div>
+          <input type="range" id="mixE" min="0" max="80" step="5" value="40" oninput="mixEInput()"></div>
+          <div class="hint" id="mixNote"></div>
+        </div>
+      </div>
+      <div id="scenKpis" class="kpis" style="margin:6px 0;"></div>
+      <div id="scenChart"></div>
+      <div class="legend" id="scenLegend"></div>
+      <div class="footnote" id="scenFoot"></div>
+      <div style="display:flex; justify-content:flex-end; margin-top:8px;">
+        <button class="tgl" onclick="exportScenJPG()">⤓ Export JPG</button>
       </div>
     </div>
   </div>
@@ -284,7 +326,7 @@
         <div class="card"><b>A wave: 20 hires = 4 future teams.</b>
           <p style="font-size:13.5px;">Wave size matches training and supervision capacity. Larger waves add headcount faster than they add reliable output.</p></div>
       </div>
-      <p><b>The dip after Month 6 is designed.</b> When teams form, top producers move into lead roles and output briefly drops — the cost of a permanent quality and training layer. It recovers as new teams settle.</p>
+      <p><b>The Month-6 step is smaller than the ramp promises — by design.</b> At each wave's month 6, four producers become leads (16 annotators + 4 leads at ~70% output), so the wave lands at 564, not 600. That gap is the visible price of a permanent quality and training layer; there is no dip, just a shallower final step.</p>
     </section>
 
     <section>
@@ -311,7 +353,7 @@
       <div class="grid2">
         <div class="card">
           <b>As a run rate</b> (miles per period, sustained)
-          <p style="font-size:13.5px;">A single wave peaks at <span class="num">≈480</span> before team formation and sustains <span class="num">≈450</span> after. <span class="num">500+/period sustained</span> requires <b>two waves — 40 people</b> (≈720 exiting Month 6, ≈900 at Month 9). <span class="num">1000/period</span> requires a third wave: ≈1,115 committed at Month 12, decided at the Month-9 review.</p>
+          <p style="font-size:13.5px;">A single wave sustains <span class="num">≈450</span> from Month 6 (lead extraction lands at M6). <span class="num">500+/period sustained</span> requires <b>two waves — 40 people</b> (≈690 exiting Month 6, ≈900 at Month 9). <span class="num">1000/period</span> requires a third wave: ≈1,140 committed at Month 12, decided at the Month-9 review.</p>
         </div>
         <div class="card">
           <b>As a delivered volume</b> (cumulative miles)
@@ -324,10 +366,10 @@
       <h2>Sizing</h2>
       <table>
         <tr><th>Sustained committed / period</th><th>Requires</th><th>Reached by</th></tr>
-        <tr><td class="num">≈ 450–480</td><td>1 wave · 20 people · 4 teams</td><td>Month 6 of that wave</td></tr>
-        <tr><td class="num">≈ 720</td><td>2 waves · 40 people · 8 teams</td><td>Exit of Month 6</td></tr>
+        <tr><td class="num">≈ 450</td><td>1 wave · 20 people · 4 teams</td><td>Month 6 of that wave</td></tr>
+        <tr><td class="num">≈ 690</td><td>2 waves · 40 people · 8 teams</td><td>Exit of Month 6</td></tr>
         <tr><td class="num">≈ 900</td><td>2 waves at full speed</td><td>Month 9</td></tr>
-        <tr><td class="num">≈ 1,115 <span class="muted">(crosses 1000 committed)</span></td><td>3 waves · 60 people · 12 teams</td><td>Month 12 · Wave 3 decided at M9</td></tr>
+        <tr><td class="num">≈ 1,140 <span class="muted">(crosses 1000 committed)</span></td><td>3 waves · 60 people · 12 teams</td><td>Month 12 · Wave 3 decided at M9</td></tr>
       </table>
       <p class="muted" style="margin-top:7px;">Rule of thumb: one wave ≈ a 450-mile-per-period module and ≈1,680 delivered miles in its first six months. Waves are trigger-armed — a signed volume commitment starts hiring the same week.</p>
     </section>
@@ -390,8 +432,8 @@
         </div>
       </details>
 
-      <details><summary>Why does output dip after Month 6?</summary>
-        <p>Team formation. Each lead still annotates at ~50% of a full target — but their first responsibility becomes delivering <b>five clean sections per period</b>: their own plus four annotators'. Self-review and peer review filter first; the lead's final review is what makes a section client-ready. That review load is exactly where the lead's other 50% goes.</p>
+      <details><summary>Where does lead extraction show in the numbers?</summary>
+        <p>At each wave’s month 6, four producers step up as leads (16 + 4 at ~70% output), so the wave’s full-speed month lands at 564 instead of 600. The strongest producers trade short-term miles for a permanent quality and training layer — the cost is a shallower step, not a drop.</p>
         <div class="roadmini" style="max-width:480px;">
           <svg viewBox="0 0 440 158" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Four annotators flow through self review and peer review into the team lead final review, producing five clean sections">
             <g font-size="10.5" font-weight="800">
@@ -477,6 +519,79 @@
       <b>Model in one line:</b> hard-terrain basis → per-annotator soft targets → division capacity → ×80% realization, applied once → commitment.
     </footer>
   </div>
+
+  <!-- ================= PAGE 3 — SCOPE MODEL ================= -->
+  <div class="page" id="page3">
+
+    <section style="margin-top:6px;">
+      <h2>What one corridor mile really costs</h2>
+      <p>This is the unit guard with measured numbers. A sample extent — a 10-mile corridor, road data from public OSM — was run through the workload predictor: <b>78.9 centerline miles</b>, <b>137.6 lanelet (lane) miles</b>, 616 segments. Annotation expansion is always reported as a <b>multiplier, never a percentage</b>, and always in its two stages — because they behave differently:</p>
+      <p class="muted">The 7.9× is this extent's road density — a rural corridor will not repeat it. The 1.74× is physics — lanes per road — and travels between jobs. "13.8×" quoted alone invites the wrong mental model.</p>
+    </section>
+
+    <section>
+      <h2>What the sample is made of</h2>
+      <table>
+        <tr><th>Class</th><th>Lane-miles</th><th>Share of work</th><th>Lane data</th></tr>
+        <tr><td>Freeway</td><td class="num">51.5</td><td>37%</td><td>measured — 0% fallback</td></tr>
+        <tr><td>Local roads</td><td class="num">24.4</td><td>18%</td><td style="color:#B3261E;font-weight:800;">93% fallback · avg 1.09 lanes</td></tr>
+        <tr><td>Major + minor arterial</td><td class="num">33.2</td><td>24%</td><td>mostly measured</td></tr>
+        <tr><td>Ramps</td><td class="num">13.8</td><td>10%</td><td>mostly measured</td></tr>
+        <tr><td>Bicycle + other</td><td class="num">14.7</td><td>11%</td><td style="color:#B3261E;font-weight:800;">other/extras 100% fallback</td></tr>
+      </table>
+      <p class="muted" style="margin-top:7px;"><b>24% of the lane-miles are assumption-driven and biased low</b> — the predictor defaults unmapped local roads to ~1 lane. The estimate below carries that as a stated caveat, not a hidden one.</p>
+    </section>
+
+    <section>
+      <h2>Productivity — one factor per cause</h2>
+      <p>Per-head steady output already includes lead extraction (leads at 70% partial output): <b>28.2 lane-miles / head / month at 100%</b> — the same number the capacity model produces, which is the internal-consistency check. Two adjustments apply, each counted <b>once</b>: the <b>complexity rate</b> carries road difficulty, and <b>realization stays at 80</b> carrying only operational overhead — rule-encoding days, QC and rework, meetings, ramp variance. Road mix never flows through realization; nothing gets banked twice.</p>
+      <p><b>The tier system behind the rates.</b> Corridors are scored additively (2–10 points: length, intersection density, access spacing, topology) by a scoring tool that runs in parallel with the workload predictor. Four tiers fall out of the score — the profiles are centroids, not definitions: <b>Easy</b> (score 2–3, ×1.6) — highways and open roads, minimal lane complexity; <b>Regular</b> (4–5, ×1.3) — suburban or rural, some merges and geometry changes, low editing overhead; <b>Complex</b> (6–7, ×1.0) — urban and semi-urban, intersection-dense, turn lanes, approaching interchanges; <b>Super-complex</b> (8–10, ×0.5) — dense multi-level corridors, distribuidores, stacked ramps and bridges, continuous access.</p>
+      <p><b>The planning model collapses this to three buckets:</b></p>
+      <table style="max-width:600px;">
+        <tr><th>Bucket</th><th>Share</th><th>Rate</th><th>Carries</th></tr>
+        <tr style="background:#FAF3E8;"><td><b>Complex miles</b></td><td class="num">20% · locked</td><td class="num">×0.5</td><td>The hardest work — including parking lots and overpasses with stacked geometry</td></tr>
+        <tr><td>Regular — hard</td><td class="num">slider</td><td class="num">×1.0</td><td>Urban / semi-urban editing</td></tr>
+        <tr><td>Regular — easy</td><td class="num">slider</td><td class="num">×1.3</td><td>Suburban / rural, low overhead</td></tr>
+      </table>
+      <p class="muted" style="margin-top:7px;">Default: 20 / 40 / 40 → <b>×1.02, effectively neutral</b>. The two Regular sliders complement each other inside the remaining 80. Easy tier (×1.6) exists in the rubric as upside; it is not planned into the mix. Chain: soft basis × complexity rate × 80% realization → committed.</p>
+      <p class="muted"><b>Why the Complex 20% is locked.</b> The ×0.5 bucket is the volatility driver of any estimate — it halves throughput wherever it appears, and it hides in places that look small on a map: parking lots, stacked-geometry overpasses, multi-level interchanges. Locking its planning share at 20% bounds the downside a schedule can silently absorb. A corridor mix scoring above 20% in this bucket is not planned inside the model — it becomes a named exception, scoped per-AOI with its own predictor run and its own dates.</p>
+    </section>
+
+    <section>
+      <h2>Two scenarios — not interchangeable</h2>
+      <div class="grid2">
+        <div class="card">
+          <span class="pill o">Scenario A</span>
+          <div class="big-when">Committed annotation target</div>
+          <div class="big-num">10,000</div>
+          <div class="big-cond">Annotated lanelet miles. Already in the work unit — only the coverage conversion (÷1.74) inherits sample bias.</div>
+        </div>
+        <div class="card">
+          <span class="pill g">Scenario B</span>
+          <div class="big-when">Committed route target</div>
+          <div class="big-num">500</div>
+          <div class="big-cond">Route miles at <b>Texas density</b>: ×13.8 → 6,900 lanelet-mile floor; local-roads fallback at 2.0 → ~7,900. The density factor is this corridor's — a different route gets a predictor run before any number is quoted.</div>
+        </div>
+      </div>
+      <p class="muted" style="margin-top:8px;">Delivery dates for both live in the <b>Scenarios graph on page 1</b> — quarterly, ramp included, reading the locked team variables. Effort reference: ~435 head-months for Scenario A at the default mix and 80% realization.</p>
+    </section>
+
+    <section>
+      <h2>Ships with these caveats</h2>
+      <p class="muted">The estimate carries its own open questions rather than getting challenged by them later.</p>
+      <table>
+        <tr><th>Open</th><th>Why it matters</th></tr>
+        <tr><td><b>Is the 30 basis lane-miles or centerline?</b></td><td>If centerline, every duration above roughly doubles.</td></tr>
+        <tr><td><b>Local-roads fallback: validate, or set to 2.0</b></td><td>Would move 137.6 → ~158 lane-mi. This is the gate before any move to 100.</td></tr>
+        <tr><td><b>Complexity scoring — rubric cutoffs pending</b></td><td>Tier rates are locked (0.5 / 1.0 / 1.3 / 1.6); the corridor-scoring rubric runs parallel with the workload predictor. Local roads likely score hardest — the same class where lanes are guessed.</td></tr>
+        <tr><td><b>Post-M9 capacity held flat</b></td><td>The model holds steady output forever. Any Wave 3 compresses the tail ~2 months per +100/month.</td></tr>
+      </table>
+    </section>
+
+    <footer>
+      <b>Scope model in one line:</b> corridor miles ×7.9 (this extent) ×1.74 (portable) = lanelet miles → ÷25.4 per head-month (90% committed, lead extraction included) → duration by heads. Sample extent: public OSM data, workload predictor, 616 segments.
+    </footer>
+  </div>
 </div>
 
 <script>
@@ -501,20 +616,21 @@ function model(){
       rows.push({m,g1:gross,g2:0,g3:0,gross:gross,hope:hope,com:Math.round(com),
         cumC:Math.round(cumC),cumG:cumG,c1:cumG,c2:0,c3:0});
     }
-    return {rows,H,head:3,teams:0,tlW1:0,tlW2:0,w2s,w3s,real,current:true};
+    return {rows,H,head:3,teams:0,tlPer:0,w2s,w3s,real,current:true};
   }
   const head = waveSize*(1+(S.w2?1:0)+(S.w3?1:0));
-  const tlW1 = S.ext ? Math.floor(waveSize*(1+(S.w2?1:0))/TEAM) : 0;
-  const tlW2 = (S.ext&&S.w3&&S.w2) ? Math.floor(waveSize/TEAM) : 0;
+  const tlPer = S.ext ? Math.floor(waveSize/TEAM) : 0; // 4 leads per 20-wave, from its own ranks
   const rows=[]; let cumC=0, cumG=0, cum1=0, cum2=0, cum3=0;
+  const waveG=(ramp,band)=>{
+    if(ramp<=0) return 0;
+    const ext = ramp>=6 ? tlPer : 0;
+    return (waveSize-ext)*per(ramp,band) + ext*tlf*per(ramp,band);
+  };
   for(let m=1;m<=H;m++){
     const r1=m, r2=S.w2? m-(w2s-1):0, r3=S.w3? m-(w3s-1):0;
-    const e1=m>=7?tlW1:0, e2=(S.w3&&m>=w3s)?tlW2:0;
-    const p1=Math.max(waveSize-e1,0), p2=S.w2?Math.max(waveSize-e2,0):0, p3=S.w3?waveSize:0;
-    const tlm=e1*tlf*per(r1,SOFT)+e2*tlf*per(r2,SOFT);
-    const g1=p1*per(r1,SOFT)+tlm, g2=p2*per(r2,SOFT), g3=p3*per(r3,SOFT);
+    const g1=waveG(r1,SOFT), g2=S.w2?waveG(r2,SOFT):0, g3=S.w3?waveG(r3,SOFT):0;
     const gross=g1+g2+g3;
-    const hope=p1*per(r1,HOPE)+p2*per(r2,HOPE)+p3*per(r3,HOPE)+e1*tlf*per(r1,HOPE)+e2*tlf*per(r2,HOPE);
+    const hope=waveG(r1,HOPE)+(S.w2?waveG(r2,HOPE):0)+(S.w3?waveG(r3,HOPE):0);
     const com=gross*real;
     cumC+=com; cumG+=gross; cum1+=g1; cum2+=g2; cum3+=g3;
     rows.push({m,g1:Math.round(g1),g2:Math.round(g2),g3:Math.round(g3),
@@ -522,7 +638,7 @@ function model(){
       cumC:Math.round(cumC),cumG:Math.round(cumG),
       c1:Math.round(cum1),c2:Math.round(cum2),c3:Math.round(cum3)});
   }
-  return {rows,H,head,teams:Math.floor(head/TEAM),tlW1,tlW2,w2s,w3s,real};
+  return {rows,H,head,teams:Math.floor(head/TEAM),tlPer,w2s,w3s,real};
 }
 
 function crossing(rows, key, thr){
@@ -576,11 +692,12 @@ function update(){
 
   document.getElementById('teamNote').textContent = M.current
     ? 'Current capacity: 3 experienced annotators · 30 miles/period each · no waves, no lead extraction.'
-    : 'Headcount '+M.head+' · '+M.teams+' teams of 1+4 · '+
-      (S.ext ? (M.tlW1+' leads leave Wave 1 production at M7'+(M.tlW2?('; '+M.tlW2+' leave Wave 2 at M'+M.w3s):'')) : 'lead extraction off') + '.';
+    : 'Headcount '+M.head+' · '+M.teams+' teams of 1+4 · every wave is identical: '+
+      (S.ext ? ((+document.getElementById('waveSize').value-M.tlPer)+' annotators + '+M.tlPer+' leads, stepping up at that wave\u2019s month 6') : 'lead extraction off') + '.';
 
   drawChart(M);
   drawLegend();
+  if(document.getElementById('scenChart')) drawScen();
 }
 
 function setFocus(m){ S.focusM=m; S.focusTouched=true; update(); }
@@ -605,6 +722,31 @@ function drawLegend(){
   document.getElementById('legend').innerHTML=h;
 }
 
+function smoothD(pts){
+  const n=pts.length;
+  if(n<3) return 'M'+pts.map(p=>p[0]+','+p[1]).join(' L');
+  const xs=pts.map(p=>p[0]), ys=pts.map(p=>p[1]);
+  const d=[], t=[];
+  for(let i=0;i<n-1;i++) d.push((ys[i+1]-ys[i])/(xs[i+1]-xs[i]));
+  t[0]=d[0]; t[n-1]=d[n-2];
+  for(let i=1;i<n-1;i++) t[i]=(d[i-1]*d[i]<=0)?0:(d[i-1]+d[i])/2;
+  for(let i=0;i<n-1;i++){
+    if(d[i]===0){ t[i]=0; t[i+1]=0; }
+    else{
+      const a=t[i]/d[i], b=t[i+1]/d[i], h=Math.hypot(a,b);
+      if(h>3){ const k=3/h; t[i]=k*a*d[i]; t[i+1]=k*b*d[i]; }
+    }
+  }
+  let p='M'+xs[0]+','+ys[0];
+  for(let i=0;i<n-1;i++){
+    const dx=(xs[i+1]-xs[i])/3;
+    p+='C'+(xs[i]+dx)+','+(ys[i]+t[i]*dx)+' '+(xs[i+1]-dx)+','+(ys[i+1]-t[i+1]*dx)+' '+xs[i+1]+','+ys[i+1];
+  }
+  return p;
+}
+function spath(pts,color,w,dash){
+  return '<path d="'+smoothD(pts)+'" fill="none" stroke="'+color+'" stroke-width="'+w+'"'+(dash?' stroke-dasharray="'+dash+'"':'')+' stroke-linecap="round"/>';
+}
 function drawChart(M){
   const W=760, Hpx=400, top=18, bottom=346, left=54, right=740;
   const n=M.rows.length, slot=(right-left)/n;
@@ -658,7 +800,7 @@ function drawChart(M){
     s+=spath(M.rows.map((r,i)=>[cx(i),y(r.cumC)]), C.road, 6.5, null);
     s+=spath(M.rows.map((r,i)=>[cx(i),y(r.cumC)]), '#FFFFFF', 2.1, '8 8');
     const bottomTags={};
-    [500,1000].forEach(thr=>{
+    [1000].forEach(thr=>{
       if(thr<maxV){
         s+='<line x1="'+left+'" y1="'+y(thr)+'" x2="'+right+'" y2="'+y(thr)+'" stroke="'+C.w2+'" stroke-width="1.5" stroke-dasharray="5 5"/>';
         const cr=crossing(M.rows,'cumC',thr);
@@ -677,8 +819,8 @@ function drawChart(M){
       s+='<text x="'+cx(i)+'" y="'+(bottom+46)+'" fill="'+C.w2+'" font-size="10" font-weight="800" text-anchor="middle">Delivered</text>';
     });
     M.rows.forEach((r,i)=>{ if(r.m===M.H) s+='<text x="'+cx(i)+'" y="'+(y(r.cumC)-10)+'" fill="'+C.commit+'" font-size="12" font-weight="800" text-anchor="middle">'+fmt(r.cumC)+'</text>'; });
-    const c500f=crossing(M.rows,'cumC',500);
-    const defFocus=(c500f&&!S.focusTouched)?c500f.m:Math.min(S.focusM,M.rows[M.rows.length-1].m);
+    const c1000f=crossing(M.rows,'cumC',1000);
+    const defFocus=(c1000f&&!S.focusTouched)?c1000f.m:Math.min(S.focusM,M.rows[M.rows.length-1].m);
     const fci=M.rows.findIndex(r=>r.m===defFocus);
     if(fci>=0){
       const r=M.rows[fci];
@@ -697,31 +839,7 @@ function drawChart(M){
   s+='</svg>';
   document.getElementById('chart').innerHTML=s;
 
-  function smoothD(pts){
-    const n=pts.length;
-    if(n<3) return 'M'+pts.map(p=>p[0]+','+p[1]).join(' L');
-    const xs=pts.map(p=>p[0]), ys=pts.map(p=>p[1]);
-    const d=[], t=[];
-    for(let i=0;i<n-1;i++) d.push((ys[i+1]-ys[i])/(xs[i+1]-xs[i]));
-    t[0]=d[0]; t[n-1]=d[n-2];
-    for(let i=1;i<n-1;i++) t[i]=(d[i-1]*d[i]<=0)?0:(d[i-1]+d[i])/2;
-    for(let i=0;i<n-1;i++){
-      if(d[i]===0){ t[i]=0; t[i+1]=0; }
-      else{
-        const a=t[i]/d[i], b=t[i+1]/d[i], h=Math.hypot(a,b);
-        if(h>3){ const k=3/h; t[i]=k*a*d[i]; t[i+1]=k*b*d[i]; }
-      }
-    }
-    let p='M'+xs[0]+','+ys[0];
-    for(let i=0;i<n-1;i++){
-      const dx=(xs[i+1]-xs[i])/3;
-      p+='C'+(xs[i]+dx)+','+(ys[i]+t[i]*dx)+' '+(xs[i+1]-dx)+','+(ys[i+1]-t[i+1]*dx)+' '+xs[i+1]+','+ys[i+1];
-    }
-    return p;
-  }
-  function spath(pts,color,w,dash){
-    return '<path d="'+smoothD(pts)+'" fill="none" stroke="'+color+'" stroke-width="'+w+'"'+(dash?' stroke-dasharray="'+dash+'"':'')+' stroke-linecap="round"/>';
-  }
+
   function badge(x,yy,text,bg,op){
     const w=text.length*6.6+16;
     let bx=x-w/2; bx=Math.max(left, Math.min(bx, right-w));
@@ -749,13 +867,238 @@ function setView(v){ S.view=v;
   document.getElementById('vCum').classList.toggle('on',v==='cum');
   update();
 }
-function showPage(p){
-  document.getElementById('page1').classList.toggle('on',p===1);
-  document.getElementById('page2').classList.toggle('on',p===2);
-  document.getElementById('nav1').classList.toggle('on',p===1);
-  document.getElementById('nav2').classList.toggle('on',p===2);
-  document.getElementById('pagetitle').textContent = p===1 ? 'Capacity model' : 'Notes & definitions';
+// ===== Scenarios engine =====
+const S2={target:'A',heads:30,focusQ:0,focusTouched:false};
+function mixVals(){
+  const h=+document.getElementById('mixH').value;
+  const e=80-h;
+  return {lock:20,h,e,factor:(20*0.5+h*1.0+e*1.3)/100};
 }
+function mixHInput(){
+  const h=+document.getElementById('mixH').value;
+  document.getElementById('mixE').value=80-h;
+  S2.focusTouched=false; update();
+}
+function mixEInput(){
+  const e=+document.getElementById('mixE').value;
+  document.getElementById('mixH').value=80-e;
+  S2.focusTouched=false; update();
+}
+function scenRoster(){
+  const ws=+document.getElementById('waveSize').value;
+  if(ws===0) return [];
+  return [{size:ws,start:1},{size:ws,start:4}];
+}
+function wave2Input(v){
+  document.getElementById('waveSize').value=v;
+  S2.focusTouched=false;
+  update();
+}
+function scenModel(){
+  const real=+document.getElementById('real').value/100;
+  const tlf=+document.getElementById('tlf').value/100;
+  const mx=mixVals();
+  const waves=scenRoster();
+  const heads=waves.reduce((a,w)=>a+w.size,0);
+  const leadsPer=heads?Math.floor(waves[0].size/5):0;
+  const HM=27, months=[];
+  let cum=0, cum1=0, cum2=0;
+  for(let m=1;m<=HM;m++){
+    const step = m>=19 ? 6 : 5; // hopeful band from Q7 (M19+)
+    let g1=0, g2=0;
+    if(heads===0){ g1 = 3*(step===6?36:30); }
+    waves.forEach((w,wi)=>{
+      const ramp=m-(w.start-1);
+      if(ramp<=0) return;
+      const ext = ramp>=6 ? leadsPer : 0;
+      let g = (w.size-ext)*(Math.min(ramp,6)*step) + ext*tlf*(Math.min(ramp,6)*step);
+      if(wi===0) g1+=g; else g2+=g;
+    });
+    const com1=g1*mx.factor*real, com2=g2*mx.factor*real, com=com1+com2;
+    cum+=com; cum1+=com1; cum2+=com2;
+    months.push({m,com,com1,com2,cum,cum1,cum2});
+  }
+  const quarters=[];
+  for(let q=1;q<=9;q++){
+    const seg=months.slice((q-1)*3,q*3);
+    quarters.push({q,
+      d1:Math.round(seg.reduce((a,b)=>a+b.com1,0)),
+      d2:Math.round(seg.reduce((a,b)=>a+b.com2,0)),
+      c1:Math.round(seg[2].cum1),
+      c2:Math.round(seg[2].cum2),
+      delivered:Math.round(seg.reduce((a,b)=>a+b.com,0)),
+      cum:Math.round(seg[2].cum)});
+  }
+  const targets = S2.target==='A' ? [{v:10000,label:'10,000mi',main:true}] :
+    [{v:6900,label:'500 route (floor)',main:true},{v:7900,label:'fallback 2.0',main:false}];
+  const crossQ=t=>{let p=0;for(const r of quarters){if(r.cum>=t&&p<t)return r.q;p=r.cum;}return null;};
+  const crossM=t=>{let p=0;for(const r of months){if(r.cum>=t&&p<t)return r.m;p=r.cum;}return null;};
+  return {quarters,months,targets,crossQ,crossM,mx,realPct:Math.round(real*100),tlfPct:Math.round(tlf*100),leadsPer,heads};
+}
+function setScenTarget(t){ S2.target=t; S2.focusTouched=false;
+  document.getElementById('tgA').classList.toggle('on',t==='A');
+  document.getElementById('tgB').classList.toggle('on',t==='B');
+  update(); }
+function setScenFocus(q){ S2.focusQ=q; S2.focusTouched=true; update(); }
+function drawScen(){
+  const M=scenModel();
+  window.LAST2=M;
+  const mx=M.mx;
+  document.getElementById('oMixH').textContent=mx.h+'%';
+  document.getElementById('oMixE').textContent=mx.e+'%';
+  document.getElementById('mixChip').textContent='· Complex locked 20% → ×'+mx.factor.toFixed(2);
+  document.getElementById('mixNote').textContent='Complex locked at 20% — includes parking lots and stacked-geometry overpasses (notes, page 3). Hard + easy share the remaining 80.';
+  const ws=+document.getElementById('waveSize').value;
+  document.getElementById('waveSize2').value=ws;
+  document.getElementById('oWave2').textContent= ws===0 ? 'Current' : ws;
+  document.getElementById('oWave2').style.color = ws>20 ? '#B3261E' : '';
+  document.getElementById('waveSize2').style.accentColor = ws>20 ? '#B3261E' : '#1B2420';
+  document.getElementById('scenReads').textContent='Uses team variables above: realization '+M.realPct+'% (operational only) · lead output '+M.tlfPct+'% · '+(M.heads===0?'current team (3 annotators, no waves)':(M.heads+' heads = two identical waves of '+ws+' ('+(ws-M.leadsPer)+' annotators + '+M.leadsPer+' leads each, W2 @ M4; leads step up at each wave\u2019s month 6)'))+' · complexity ×'+mx.factor.toFixed(2);
+  // KPI chips
+  let k='';
+  M.targets.forEach(t=>{
+    const cq=M.crossQ(t.v), cm=M.crossM(t.v);
+    const dual=fmt(t.v)+' ann / '+fmt(Math.round(t.v/13.8))+' route mi';
+    k+=kpi(t.label+(t.main?'':' band')+' lands:', cq?('Q'+cq):'beyond Q9', (cm?('~month '+cm+' · '):'')+dual);
+  });
+  const q9=M.quarters[8];
+  k+=kpi('Delivered by Q9:', fmt(q9.cum)+' ann / '+fmt(Math.round(q9.cum/13.8))+' route', 'Q7+ = hopeful trajectory');
+  document.getElementById('scenKpis').innerHTML=k;
+  // chart
+  const W=720,Hh=430,top=34,bottom=346,left=58,right=700;
+  const n=9, slot=(right-left)/n, cxq=i=>left+slot*i+slot/2;
+  const maxV=Math.max(M.quarters[8].cum, ...M.targets.map(t=>t.v))*1.1;
+  const y=v=>bottom-(v/maxV)*(bottom-top);
+  let s='<svg viewBox="0 0 '+W+' '+Hh+'" xmlns="http://www.w3.org/2000/svg">';
+  // phase bands
+  const bx=q0=>left+slot*q0;
+  s+='<rect x="'+left+'" y="'+top+'" width="'+(slot*3)+'" height="'+(bottom-top)+'" fill="#2F5D8C" fill-opacity="0.05"/>';
+  s+='<rect x="'+bx(3)+'" y="'+top+'" width="'+(slot*3)+'" height="'+(bottom-top)+'" fill="#D9822B" fill-opacity="0.06"/>';
+  s+='<rect x="'+bx(6)+'" y="'+top+'" width="'+(slot*3)+'" height="'+(bottom-top)+'" fill="#9AA098" fill-opacity="0.10"/>';
+  s+='<text x="'+(bx(0)+slot*1.5)+'" y="'+(top-8)+'" fill="#2F5D8C" font-size="10.5" font-weight="800" text-anchor="middle">GROWTH</text>';
+  s+='<text x="'+(bx(3)+slot*1.5)+'" y="'+(top-8)+'" fill="#D9822B" font-size="10.5" font-weight="800" text-anchor="middle">STABILIZATION</text>';
+  s+='<text x="'+(bx(6)+slot*1.5)+'" y="'+(top-8)+'" fill="#6C736B" font-size="10.5" font-weight="800" text-anchor="middle">MATURE · HOPEFUL</text>';
+  // gridlines
+  const step=niceStep(maxV/4);
+  for(let v=0;v<=maxV;v+=step){
+    s+='<line x1="'+left+'" y1="'+y(v)+'" x2="'+right+'" y2="'+y(v)+'" stroke="#E7E9E3"/>';
+    s+='<text x="'+(left-6)+'" y="'+(y(v)+4)+'" fill="#6C736B" font-size="11" text-anchor="end">'+fmt(Math.round(v))+'</text>';
+  }
+  // quarter bars (delivered per quarter)
+  const bw=Math.min(44,slot*0.6);
+  M.quarters.forEach((r,i)=>{
+    let base=bottom;
+    [[r.c1,C.w1],[r.c2,C.w2]].forEach(([v,col])=>{
+      if(v>0){ const h=(v/maxV)*(bottom-top);
+        s+='<rect x="'+(cxq(i)-bw/2)+'" y="'+(base-h)+'" width="'+bw+'" height="'+h+'" fill="'+col+'"/>';
+        base-=h; }
+    });
+  });
+  // cumulative road: committed through Q6, hopeful grey dashed Q7-8
+  const ptsAll=M.quarters.map((r,i)=>[cxq(i),y(r.cum)]);
+  const pts16=ptsAll.slice(0,6), pts68=ptsAll.slice(5);
+  s+=spath(pts16, C.road, 6.5, null);
+  s+=spath(pts16, '#FFFFFF', 2.1, '8 8');
+  s+=spath(pts68, C.hope, 3.5, '6 6');
+  // targets
+  const bottomTags={};
+  M.targets.forEach(t=>{
+    s+='<line x1="'+left+'" y1="'+y(t.v)+'" x2="'+right+'" y2="'+y(t.v)+'" stroke="'+C.w2+'" stroke-width="'+(t.main?1.6:1)+'" stroke-dasharray="5 5"'+(t.main?'':' opacity="0.55"')+'/>';
+    const cq=M.crossQ(t.v);
+    if(cq){ const i=cq-1;
+      s+='<circle cx="'+cxq(i)+'" cy="'+y(t.v)+'" r="5" fill="'+C.w2+'"'+(t.main?'':' opacity="0.6"')+'/>';
+      if(S2.target==='B') (bottomTags[cq]=bottomTags[cq]||[]).push(t.label);
+    } else {
+      s+='<text x="'+(right-4)+'" y="'+(y(t.v)-6)+'" fill="'+C.w2+'" font-size="10.5" font-weight="800" text-anchor="end">'+t.label+' — beyond Q9</text>';
+    }
+  });
+  Object.keys(bottomTags).forEach(q=>{
+    const i=+q-1;
+    s+='<text x="'+cxq(i)+'" y="'+(bottom+46)+'" fill="'+C.w2+'" font-size="10.5" font-weight="800" text-anchor="middle">'+bottomTags[q].join(' & ')+'</text>';
+    s+='<text x="'+cxq(i)+'" y="'+(bottom+57)+'" fill="'+C.w2+'" font-size="10" font-weight="800" text-anchor="middle">Delivered</text>';
+  });
+  // focus point
+  const mainT=M.targets[0];
+  const defQ=(!S2.focusTouched && M.crossQ(mainT.v)) ? M.crossQ(mainT.v) : Math.min(Math.max(S2.focusQ,1),9);
+  const fi=defQ-1, fr=M.quarters[fi];
+  s+='<circle cx="'+cxq(fi)+'" cy="'+y(fr.cum)+'" r="8" fill="'+C.road+'" stroke="#FFFFFF" stroke-width="2"/>';
+  s+=badge2(cxq(fi), y(fr.cum)-40, 'Q'+fr.q+' - '+fmt(fr.cum)+' annotated mi / '+fmt(Math.round(fr.cum/13.8))+' route mi', left, right);
+  // click zones + x labels
+  s+='<text x="'+(left-6)+'" y="'+(bottom+33)+'" fill="#6C736B" font-size="9" font-weight="800" text-anchor="end">output mi</text>';
+  M.quarters.forEach((r,i)=>{
+    s+='<rect x="'+(left+slot*i)+'" y="'+top+'" width="'+slot+'" height="'+(bottom-top)+'" fill="#000" fill-opacity="0" pointer-events="all" style="cursor:pointer" onclick="setScenFocus('+r.q+')"/>';
+    s+='<text x="'+cxq(i)+'" y="'+(bottom+20)+'" fill="#4A524A" font-size="12" font-weight="700" text-anchor="middle">Q'+r.q+'</text>';
+    s+='<text x="'+cxq(i)+'" y="'+(bottom+33)+'" fill="#6C736B" font-size="9.5" font-weight="700" text-anchor="middle">'+fmt(r.delivered)+'</text>';
+  });
+  s+='</svg>';
+  document.getElementById('scenChart').innerHTML=s;
+  document.getElementById('scenLegend').innerHTML=
+    '<span><i style="background:'+C.w1+'"></i>Wave 1 · cumulative delivered</span>'+
+    (M.heads&&scenRoster().length>1?'<span><i style="background:'+C.w2+'"></i>Wave 2</span>':'')+
+    '<span><span class="cl"></span>Cumulative — committed road to Q6</span>'+
+    '<span style="color:'+C.hope+'">╌ mature-team trajectory (hopeful basis)</span>'+
+    '<span style="color:'+C.w2+'">╌ target</span>';
+  document.getElementById('scenFoot').textContent =
+    (S2.target==='A' ? 'Scenario A: 10,000 annotated lanelet miles — already in the work unit.' :
+     'Scenario B: 500 route miles × 13.8 (Texas density) = 6,900 lanelet-mile floor; local-roads fallback at 2.0 → ~7,900. Density is per-corridor — a different route gets a predictor run first.')+
+    ' Chain: soft basis × complexity ×'+mx.factor.toFixed(2)+' × realization '+M.realPct+'% → committed. Q7+ uses the hopeful band by design and is labeled as trajectory, not commitment.';
+}
+function badge2(x,yy,text,lo,hi){
+  const w=text.length*6.6+16;
+  let bx=x-w/2; bx=Math.max(lo, Math.min(bx, hi-w));
+  return '<g><rect x="'+bx+'" y="'+yy+'" width="'+w+'" height="22" rx="6" fill="'+C.commit+'" fill-opacity="0.55"/>'+
+    '<text x="'+(bx+w/2)+'" y="'+(yy+15)+'" fill="#fff" font-size="11.5" font-weight="800" text-anchor="middle">'+text+'</text></g>';
+}
+function exportScenJPG(){
+  const M=window.LAST2; if(!M) return;
+  const mx=M.mx, mainT=M.targets[0], cq=M.crossQ(mainT.v), cm=M.crossM(mainT.v);
+  const scen='Scenario '+S2.target+': '+(S2.target==='A'?'10,000 annotated lanelet mi':'500 route mi (Texas density) \u2192 6,900 floor / 7,900 fallback')
+    +' \u00b7 '+(M.heads===0?'current team (3)':M.heads+' heads')+' \u00b7 mix Complex 20(lock)/Hard '+mx.h+'/Easy '+mx.e+' (\u00d7'+mx.factor.toFixed(2)+')'
+    +' \u00b7 realization '+M.realPct+'% \u00b7 lead output '+M.tlfPct+'%';
+  const kline='Lands: '+(cq?('Q'+cq+' (~M'+cm+')'):'beyond Q9')+' \u00b7 delivered by Q9: '+fmt(M.quarters[8].cum)+' ann / '+fmt(Math.round(M.quarters[8].cum/13.8))+' route \u00b7 Q7+ = hopeful, not committed';
+  const one='Chain: soft basis \u00d7 complexity \u00d7 realization (operational, once) \u2192 committed. Quarterly view \u00b7 sales pitch, not committed numbers.';
+  let svgStr=document.getElementById('scenChart').innerHTML;
+  svgStr=svgStr.replace('<svg ','<svg width="720" height="430" ');
+  const blob=new Blob([svgStr],{type:'image/svg+xml;charset=utf-8'});
+  const url=URL.createObjectURL(blob);
+  const img=new Image();
+  img.onload=function(){
+    const sc=2, PW=760, PH=590;
+    const cv=document.createElement('canvas');
+    cv.width=PW*sc; cv.height=PH*sc;
+    const ctx=cv.getContext('2d'); ctx.scale(sc,sc);
+    ctx.fillStyle='#FFFFFF'; ctx.fillRect(0,0,PW,PH);
+    ctx.fillStyle='#1B2420'; ctx.font='800 19px system-ui, sans-serif';
+    ctx.fillText('Delivery Trajectory \u2014 Scenario '+S2.target, 20, 34);
+    ctx.font='700 11px system-ui, sans-serif'; ctx.fillStyle='#6C736B';
+    ctx.fillText('Exported '+new Date().toISOString().slice(0,10), 20, 52);
+    ctx.drawImage(img, 20, 62, 720, 430);
+    ctx.fillStyle='#1B2420'; ctx.font='800 12px system-ui, sans-serif';
+    ctx.fillText(scen, 20, 518);
+    ctx.font='700 12px system-ui, sans-serif';
+    ctx.fillText(kline, 20, 538);
+    ctx.fillStyle='#6C736B'; ctx.font='700 10.5px system-ui, sans-serif';
+    ctx.fillText(one, 20, 558);
+    URL.revokeObjectURL(url);
+    cv.toBlob(function(b){
+      const a=document.createElement('a');
+      a.href=URL.createObjectURL(b);
+      a.download='trajectory_'+S2.target+'_'+(M.heads||3)+'h_x'+mx.factor.toFixed(2)+'.jpg';
+      a.click();
+      setTimeout(function(){URL.revokeObjectURL(a.href);},2000);
+    },'image/jpeg',0.92);
+  };
+  img.src=url;
+}
+function showPage(p){
+  const titles={1:'Capacity model',2:'Notes & definitions',3:'Scope — the 10,000-mile estimate'};
+  [1,2,3].forEach(i=>{
+    document.getElementById('page'+i).classList.toggle('on', i===p);
+    document.getElementById('nav'+i).classList.toggle('on', i===p);
+  });
+  document.getElementById('pagetitle').textContent = titles[p];
+}
+showPage(1);
 function exportJPG(){
   const M=window.LAST; if(!M) return;
   const view=S.view, H=M.rows[M.rows.length-1].m;
